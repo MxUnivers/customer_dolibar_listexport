@@ -345,6 +345,50 @@ function exportTableToPNGFromHTML(table, filename='') {
 }
 */
 
+
+
+$(document).ready(function () {
+    $(".export").on('click', function (event) {
+        var $self = $(this);
+        var $format = $self.attr("title");
+
+        if ($format == 'comptabilite') {
+            var $popup_message = 'Génération du fichier de comptabilité en cours...';
+            var $filename = 'export_comptabilite.pdf';
+
+            $('#dialogforpopup').html($popup_message);
+            $('#dialogforpopup').dialog({
+                title: 'Export Comptabilité',
+                buttons: {},
+                open: function (event, ui) {
+                    var args = [$("table.liste").first(), $filename];
+                    exportComptabiliteToPDF.apply($self, args);
+                }
+            });
+        }
+    });
+});
+
+
+
+function exportComptabiliteToPDF(table, filename) {
+    var doc = new jsPDF('l', 'pt');
+
+    // Ajouter un titre
+    doc.setFontSize(15);
+    doc.text(20, 30, 'Export Comptabilité');
+
+    // Convertir la table en PDF
+    doc.autoTable({
+        html: table.get(0),
+        startY: 50,
+        styles: { fontSize: 8, overflow: 'linebreak' }
+    });
+
+    doc.save(filename);
+}
+
+
 <?php
 
 //}

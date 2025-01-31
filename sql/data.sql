@@ -20,6 +20,8 @@ INSERT INTO llx_listexportimport_format(format, type, description, title, warnin
 INSERT INTO llx_listexportimport_format(format, type, description, title, warning, picto, position, active) VALUES ('png', 'export', '', 'ExportPNG', '', 'image.png', 3, 1);
 INSERT INTO llx_listexportimport_format(format, type, description, title, warning, picto, position, active) VALUES ('sql', 'export', '', 'ExportSQL', 'ExportsFullList', 'sql.png', 4, 1);
 INSERT INTO llx_listexportimport_format(format, type, description, title, warning, picto, position, active) VALUES ('csvfromdb', 'export', 'CSVFromDBDescription', 'ExportCSVFromDB', 'ExportsFullList', 'csv.png', 5, 0);
+INSERT INTO llx_listexportimport_format(format, type, description, title, warning, picto, position, active) VALUES ('comptabilite', 'export', '', 'ExportCompta', '', 'image.png', 6, 1);
+
 
 -- Import
 INSERT INTO llx_listexportimport_format(format, type, description, title, warning, picto, position, active) VALUES ('csv', 'import', 'DataShouldFitToTableFields', 'ImportCSV', '', 'csv.png', 10, 0);

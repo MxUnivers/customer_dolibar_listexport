@@ -31,24 +31,24 @@
 /**
  * Put your class' description here
  */
-class ListExportImport// extends CommonObject
+class ListExportImport // extends CommonObject
 {
 
-    /** @var DoliDb Database handler */
+	/** @var DoliDb Database handler */
 	public $db;
-    /** @var string Error code or message */
+	/** @var string Error code or message */
 	public $error;
-    /** @var array Several error codes or messages */
+	/** @var array Several error codes or messages */
 	public $errors = array();
-    /** @var string Id to identify managed object */
-	public $element='list';
-    /** @var string Name of table without prefix where object is stored */
-	public $table_element='listexportimport_format';
-    /** @var string Id to identify managed object */
-	public $picto='listexportimport@listexportimport';
-    /** @var int An example ID */
+	/** @var string Id to identify managed object */
+	public $element = 'list';
+	/** @var string Name of table without prefix where object is stored */
+	public $table_element = 'listexportimport_format';
+	/** @var string Id to identify managed object */
+	public $picto = 'listexportimport@listexportimport';
+	/** @var int An example ID */
 	public $formats = array();
-        
+
 
 	/**
 	 * Constructor
@@ -61,36 +61,55 @@ class ListExportImport// extends CommonObject
 
 		return 1;
 	}
-        
-        /**
+
+	/**
 	 * Load object in memory from database
 	 *
 	 * @param int $id Id object
 	 * @return int <0 if KO, >0 if OK
 	 */
-	public function getFormats($type='', $only_active=1)
+	public function getFormats($type = '', $only_active = 1)
 	{
 		$sql = "SELECT t.rowid, t.format, t.description, t.type, t.title, t.warning, t.picto, t.position, t.active";
-		$sql.= " FROM " . MAIN_DB_PREFIX . "listexportimport_format as t";
-                if (! empty($type)) $sql.= " WHERE t.type = '" . $type . "'";
-		if ($only_active) $sql.= (empty($type) ? " WHERE" : " AND")." t.active = 1";
-                $sql.= " ORDER BY t.position ASC";
+		$sql .= " FROM " . MAIN_DB_PREFIX . "listexportimport_format as t";
+		if (!empty($type))
+			$sql .= " WHERE t.type = '" . $type . "'";
+		if ($only_active)
+			$sql .= (empty($type) ? " WHERE" : " AND") . " t.active = 1";
+		$sql .= " ORDER BY t.position ASC";
 
 		dol_syslog(__METHOD__ . " sql=" . $sql, LOG_DEBUG);
 		$resql = $this->db->query($sql);
 		if ($resql) {
-                        $i = 0;
-                        $num = $this->db->num_rows($resql);
-                        $this->formats = array();
-                        
+			$i = 0;
+			$num = $this->db->num_rows($resql);
+			$this->formats = array();
+
 			while ($i < $num) {
 				$obj = $this->db->fetch_object($resql);
-                                
-                                $this->formats[$obj->rowid] = $obj;
-                                
+
+				$this->formats[$obj->rowid] = $obj;
+
 				$i++;
 			}
 			$this->db->free($resql);
+
+
+			// ✅ Ajouter un format "Export Comptabilité"
+			$this->formats[] = (object) array(
+				'rowid' => 9999,
+				// ID unique fictif
+				'format' => 'comptabilite',
+				'description' => 'Export des données comptables',
+				'type' => 'export',
+				'title' => 'Export Comptabilité',
+				'warning' => '',
+				'picto' => 'accounting.png',
+				// Icône personnalisée (à placer dans /img)
+				'position' => 99,
+				// Position à la fin de la liste
+				'active' => 1 // Actif par défaut
+			);
 
 			return 1;
 		} else {
@@ -110,10 +129,10 @@ class ListExportImport// extends CommonObject
 	public function isActiveFormat($type, $format)
 	{
 		$sql = "SELECT count(*) as is_active";
-		$sql.= " FROM " . MAIN_DB_PREFIX . "listexportimport_format as t";
-		$sql.= " WHERE t.type = '" . $type . "'";
-		$sql.= " AND t.format = '" . $format . "'";
-		$sql.= " AND t.active = 1";
+		$sql .= " FROM " . MAIN_DB_PREFIX . "listexportimport_format as t";
+		$sql .= " WHERE t.type = '" . $type . "'";
+		$sql .= " AND t.format = '" . $format . "'";
+		$sql .= " AND t.active = 1";
 
 		dol_syslog(__METHOD__ . " sql=" . $sql, LOG_DEBUG);
 		$resql = $this->db->query($sql);
@@ -138,41 +157,41 @@ class ListExportImport// extends CommonObject
 	 * @param int $notrigger 0=launch triggers after, 1=disable triggers
 	 * @return int <0 if KO, >0 if OK
 	 */
-	public function enable($id, $active=1)
+	public function enable($id, $active = 1)
 	{
 		$error = 0;
-                
-                // Update request
-                $sql = "UPDATE " . MAIN_DB_PREFIX . "listexportimport_format SET";
-                $sql.= " active = ".$active;
-                $sql.= " WHERE rowid = " . $id;
 
-                $this->db->begin();
+		// Update request
+		$sql = "UPDATE " . MAIN_DB_PREFIX . "listexportimport_format SET";
+		$sql .= " active = " . $active;
+		$sql .= " WHERE rowid = " . $id;
 
-                dol_syslog(__METHOD__ . " sql=" . $sql, LOG_DEBUG);
-                $resql = $this->db->query($sql);
-                if (! $resql) {
-                        $error ++;
-                        $this->errors[] = "Error " . $this->db->lasterror();
-                }
+		$this->db->begin();
 
-                // Commit or rollback
-                if ($error) {
-                        foreach ($this->errors as $errmsg) {
-                                dol_syslog(__METHOD__ . " " . $errmsg, LOG_ERR);
-                                $this->error.=($this->error ? ', ' . $errmsg : $errmsg);
-                        }
-                        $this->db->rollback();
+		dol_syslog(__METHOD__ . " sql=" . $sql, LOG_DEBUG);
+		$resql = $this->db->query($sql);
+		if (!$resql) {
+			$error++;
+			$this->errors[] = "Error " . $this->db->lasterror();
+		}
 
-                        return -1 * $error;
-                } else {
-                        $this->db->commit();
+		// Commit or rollback
+		if ($error) {
+			foreach ($this->errors as $errmsg) {
+				dol_syslog(__METHOD__ . " " . $errmsg, LOG_ERR);
+				$this->error .= ($this->error ? ', ' . $errmsg : $errmsg);
+			}
+			$this->db->rollback();
 
-                        return 1;
-                }
+			return -1 * $error;
+		} else {
+			$this->db->commit();
+
+			return 1;
+		}
 	}
-        
-        /**
+
+	/**
 	 * Update object into database
 	 *
 	 * @param User $user User that modify
@@ -181,56 +200,57 @@ class ListExportImport// extends CommonObject
 	 */
 	public function disable($id)
 	{
-                $idarray = explode(',', $id);
-                
-                foreach ($idarray as $format_id) {
-                    self::enable($format_id, 0);
-                }
+		$idarray = explode(',', $id);
+
+		foreach ($idarray as $format_id) {
+			self::enable($format_id, 0);
+		}
 	}
-        
-        /**
+
+	/**
 	 * Update object into database
 	 *
 	 * @param User $user User that modify
 	 * @param int $notrigger 0=launch triggers after, 1=disable triggers
 	 * @return int <0 if KO, >0 if OK
 	 */
-	public function setPosition($from, $to, $id=0, $not=0)
+	public function setPosition($from, $to, $id = 0, $not = 0)
 	{
 		$error = 0;
-                
-                // Update request
-                $sql = "UPDATE " . MAIN_DB_PREFIX . "listexportimport_format SET";
-                $sql.= " position = " . $to;
-                $sql.= " WHERE position = " . $from;
-                if ($id > 0) $sql.= " AND rowid" . ($not ? " != " : " = ") . $id;
 
-                $this->db->begin();
+		// Update request
+		$sql = "UPDATE " . MAIN_DB_PREFIX . "listexportimport_format SET";
+		$sql .= " position = " . $to;
+		$sql .= " WHERE position = " . $from;
+		if ($id > 0)
+			$sql .= " AND rowid" . ($not ? " != " : " = ") . $id;
 
-                dol_syslog(__METHOD__ . " sql=" . $sql, LOG_DEBUG);
-                $resql = $this->db->query($sql);
-                if (! $resql) {
-                        $error ++;
-                        $this->errors[] = "Error " . $this->db->lasterror();
-                }
+		$this->db->begin();
 
-                // Commit or rollback
-                if ($error) {
-                        foreach ($this->errors as $errmsg) {
-                                dol_syslog(__METHOD__ . " " . $errmsg, LOG_ERR);
-                                $this->error.=($this->error ? ', ' . $errmsg : $errmsg);
-                        }
-                        $this->db->rollback();
+		dol_syslog(__METHOD__ . " sql=" . $sql, LOG_DEBUG);
+		$resql = $this->db->query($sql);
+		if (!$resql) {
+			$error++;
+			$this->errors[] = "Error " . $this->db->lasterror();
+		}
 
-                        return -1 * $error;
-                } else {
-                        $this->db->commit();
+		// Commit or rollback
+		if ($error) {
+			foreach ($this->errors as $errmsg) {
+				dol_syslog(__METHOD__ . " " . $errmsg, LOG_ERR);
+				$this->error .= ($this->error ? ', ' . $errmsg : $errmsg);
+			}
+			$this->db->rollback();
 
-                        return 1;
-                }
+			return -1 * $error;
+		} else {
+			$this->db->commit();
+
+			return 1;
+		}
 	}
-        
-        /**
+
+	/**
 	 * Update object into database
 	 *
 	 * @param User $user User that modify
@@ -239,19 +259,19 @@ class ListExportImport// extends CommonObject
 	 */
 	public function up($id)
 	{
-            if (count($this->formats) == 0) {
-                $this->getFormats('', 0);
-            }
-            
-            $pos = $this->formats[$id]->position;
-            $newpos = $pos - 1;
-            
-            if (self::setPosition($newpos, $pos)) { // swap formats on new position to our position
-                self::setPosition($pos, $newpos, $id); // move to the new position! (only selected format)
-            }
+		if (count($this->formats) == 0) {
+			$this->getFormats('', 0);
+		}
+
+		$pos = $this->formats[$id]->position;
+		$newpos = $pos - 1;
+
+		if (self::setPosition($newpos, $pos)) { // swap formats on new position to our position
+			self::setPosition($pos, $newpos, $id); // move to the new position! (only selected format)
+		}
 	}
-        
-        /**
+
+	/**
 	 * Update object into database
 	 *
 	 * @param User $user User that modify
@@ -261,14 +281,14 @@ class ListExportImport// extends CommonObject
 	public function down($id)
 	{
 		if (count($this->formats) == 0) {
-                    $this->getFormats('', 0);
-                }
+			$this->getFormats('', 0);
+		}
 
-                $pos = $this->formats[$id]->position;
-                $newpos = $pos + 1;
+		$pos = $this->formats[$id]->position;
+		$newpos = $pos + 1;
 
-                if (self::setPosition($newpos, $pos)) { // swap formats on new position to our position
-                    self::setPosition($pos, $newpos, $id); // move to the new position! (only selected format)
-                }
+		if (self::setPosition($newpos, $pos)) { // swap formats on new position to our position
+			self::setPosition($pos, $newpos, $id); // move to the new position! (only selected format)
+		}
 	}
 }

@@ -125,9 +125,9 @@ class ActionsListExportImport
                 foreach ($pathtojs as $js) {
                     echo '<script type="text/javascript" language="javascript" src="' . $js . '"></script>' . "\n";
                 }
-?>
+                ?>
                 <script type="text/javascript" language="javascript">
-                    $(document).ready(function() {
+                    $(document).ready(function () {
                         var $form = $('div.fiche form').first(); // Les formulaire de liste n'ont pas tous les même name
 
                         // Case of task list into project
@@ -137,17 +137,17 @@ class ActionsListExportImport
                             $('div.fiche div.titre').first().append('<?php echo $download; ?>'); // Il peut y avoir plusieurs titre dans la page
                         <?php } ?>
 
-                        $(document).click(function() {
+                        $(document).click(function () {
                             $('.dropdown-click .dropdown-content').removeClass('show');
                         });
 
-                        $('.drop-btn').click(function(e) {
+                        $('.drop-btn').click(function (e) {
                             e.stopPropagation();
                             $('.dropdown-click .dropdown-content').removeClass('show');
                             $(this).next().addClass('show');
                         });
 
-                        $(".import").on('click', function(event) {
+                        $(".import").on('click', function (event) {
                             var $self = $(this);
                             var $format = $self.attr("title");
 
@@ -160,7 +160,7 @@ class ActionsListExportImport
                                 $('#dialogforpopup').dialog({
                                     title: '<?php echo $langs->trans('FreeList'); ?>',
                                     autoOpen: true,
-                                    open: function() {
+                                    open: function () {
                                         $(this).parent().find("button.ui-button:eq(2)").focus();
                                     },
                                     resizable: false,
@@ -169,14 +169,14 @@ class ActionsListExportImport
                                     modal: true,
                                     closeOnEscape: false,
                                     buttons: {
-                                        "Yes": function() {
+                                        "Yes": function () {
                                             // Envoi de la requête HTTP en mode synchrone
                                             $.ajax({
                                                 url: '<?php echo dol_buildpath('/listexportimport/ajax/ajax.php', 1); ?>',
                                                 type: 'post',
                                                 data: data,
                                                 async: false
-                                            }).done(function(response) {
+                                            }).done(function (response) {
                                                 //console.log(response);
                                                 if (response.length > 0 && response != 'success') {
                                                     $('#dialogforpopup').dialog('close');
@@ -194,7 +194,7 @@ class ActionsListExportImport
                                                 }
                                             });
                                         },
-                                        "No": function() {
+                                        "No": function () {
                                             var options = "";
                                             var pageno = "";
                                             var urljump = pageno + (pageno.indexOf("?") < 0 ? "?" : "") + options;
@@ -216,7 +216,7 @@ class ActionsListExportImport
                                 $('#import-file-input').click();
                             }
                         });
-                        $('#import-file-input').change(function() {
+                        $('#import-file-input').change(function () {
                             var fileinput = this;
                             var filetype = $(fileinput).attr('name');
                             var filename = $(fileinput).val();
@@ -235,14 +235,14 @@ class ActionsListExportImport
                             $('#dialogforpopup').dialog({
                                 title: '<?php echo $langs->trans('ListImport'); ?>',
                                 buttons: {},
-                                open: function(event, ui) {
+                                open: function (event, ui) {
                                     // Importation du fichier
                                     var ajax_url = '<?php echo dol_buildpath('/listexportimport/ajax/ajax.php', 1); ?>';
                                     readFile(fileinput.files[0], filetype, $form.attr('action'), filename, ajax_url);
                                 }
                             });
                         });
-                        $(".export").on('click', function(event) {
+                        $(".export").on('click', function (event) {
                             var $self = $(this);
                             var $format = $self.attr("title");
                             var $listname = $(document).find("title").text();
@@ -282,14 +282,14 @@ class ActionsListExportImport
                                 $('#dialogforpopup').dialog({
                                     title: '<?php echo $langs->trans('ListExport'); ?>',
                                     buttons: {},
-                                    open: function(event, ui) {
+                                    open: function (event, ui) {
                                         // Envoi de la requête HTTP en mode synchrone
                                         $.ajax({
                                             url: '<?php echo dol_buildpath('/listexportimport/ajax/ajax.php', 1); ?>',
                                             type: 'post',
                                             data: data,
                                             async: false
-                                        }).done(function(exported_data) {
+                                        }).done(function (exported_data) {
                                             //console.log(exported_data);
                                             var args = [$format, exported_data, $filename];
                                             exportTableToFile.apply($self, args);
@@ -305,7 +305,7 @@ class ActionsListExportImport
                                 $('#dialogforpopup').dialog({
                                     title: '<?php echo $langs->trans('ListExport'); ?>',
                                     buttons: {},
-                                    open: function(event, ui) {
+                                    open: function (event, ui) {
                                         var args = ['table.liste', $filename];
                                         exportTableToPNG.apply($self, args);
 
@@ -324,14 +324,14 @@ class ActionsListExportImport
                                 $('#dialogforpopup').dialog({
                                     title: '<?php echo $langs->trans('ListExport'); ?>',
                                     buttons: {},
-                                    open: function(event, ui) {
+                                    open: function (event, ui) {
                                         // Envoi de la requête HTTP en mode synchrone
                                         $.ajax({
                                             url: $form.attr('action'),
                                             type: $form.attr('method'),
                                             data: data,
                                             async: false
-                                        }).done(function(html) {
+                                        }).done(function (html) {
                                             // Récupération de la table html qui nous intéresse
                                             var $table = $(html).find('table.liste,table#listtable');
                                             var has_search_button = $table.has('input[name="button_search"],th.maxwidthsearch').length;
@@ -346,7 +346,7 @@ class ActionsListExportImport
 
                                             // Suppression de la dernière colonne qui contient seulement les loupes des filtres
                                             if (has_search_button) {
-                                                $table.find('th:last-child, td:last-child').each(function(index) {
+                                                $table.find('th:last-child, td:last-child').each(function (index) {
                                                     $(this).find('dl').remove();
                                                     if ($(this).closest('table').hasClass('liste')) $(this).remove();
                                                 });
@@ -359,7 +359,7 @@ class ActionsListExportImport
 
                                             // Suppression des espaces pour les nombres
                                             <?php if (!empty($conf->global->LIST_EXPORT_IMPORT_DELETESPACEFROMNUMBER)) { ?>
-                                                $table.find('td').each(function(e) {
+                                                $table.find('td').each(function (e) {
                                                     var nbWthtSpace = $(this).text().replace(/ /g, '').replace(/\xa0/g, '');
                                                     var commaToPoint = nbWthtSpace.replace(',', '.');
                                                     if ($.isNumeric(commaToPoint)) $(this).html(nbWthtSpace);
@@ -367,7 +367,7 @@ class ActionsListExportImport
                                             <?php } ?>
 
                                             // Remplacement des sous-table par leur valeur text(), notamment pour la ref dans les listes de propales, factures...
-                                            $table.find('td > table').map(function(i, cell) {
+                                            $table.find('td > table').map(function (i, cell) {
                                                 $cell = $(cell);
                                                 $cell.html($cell.text());
                                             });
@@ -391,10 +391,13 @@ class ActionsListExportImport
                                                     }
 
                                                     // recupérer tio des date de comptabilité 
-                                                    // Récupérer la valeur de l'input avec id "search_date_start"
-                                                    let dateStart = document.getElementById('search_date_start').value;
-                                                    // Récupérer la valeur de l'input avec id "search_date_end"
-                                                    let dateEnd = document.getElementById('search_date_end').value;
+                                                   // Récupérer les dates depuis les champs input
+                                                   let dateStartElement = document.getElementById('search_date_start');
+                                                   let dateEndElement = document.getElementById('search_date_end');
+
+                                                    // Vérifier si les éléments existent avant d'extraire la valeur
+                                                    let dateStart = dateStartElement ? "Periode du : "+dateStartElement.value : "";
+                                                    let dateEnd = dateEndElement ? "Au : "+dateEndElement.value : "";
                                                     // Afficher les valeurs dans la console
                                                     console.log("Date de début :", dateStart);
                                                     console.log("Date de fin :", dateEnd);
@@ -433,13 +436,18 @@ class ActionsListExportImport
 
 
                                                     // Ajouter les informations supplémentaires dans l'entête
-                                                    doc.setFontSize(10);
 
-                                                    // ✅ **Aligner les dates à droite**
-                                                    var textRightX =  Number(width - width / 5); // Position tout à droite
-                                                    doc.text(textRightX, 40, 'Période du : ' + dateStart);
-                                                    doc.text(textRightX, 55, 'Au : ' + dateEnd);
-                                                    
+
+                                                    //  filtre de date en question
+                                                    // if (dateStart ) {
+                                                        doc.setFontSize(10);
+                                                        // ✅ **Aligner les dates à droite**
+                                                        var textRightX = Number(width - width / 5); // Position tout à droite
+                                                        doc.text(textRightX, 40, dateStart);
+                                                        doc.text(textRightX, 55,  dateEnd);
+                                                    // }
+
+
 
 
 
@@ -479,10 +487,10 @@ class ActionsListExportImport
                                                     //doc.output('dataurlnewwindow');
                                                     doc.save($filename);
                                                     break;
-                                                    /*case 'png':
-                                                        var args = [$table, $filename];
-                                                        exportTableToPNGFromHTML.apply($self, args);
-                                                        return;//break;*/
+                                                /*case 'png':
+                                                    var args = [$table, $filename];
+                                                    exportTableToPNGFromHTML.apply($self, args);
+                                                    return;//break;*/
                                             }
 
                                             $('#dialogforpopup').dialog('close');
@@ -493,7 +501,7 @@ class ActionsListExportImport
                         });
                     });
                 </script>
-<?php
+                <?php
             } // end if ($user->rights->listexportimport->export || $user->rights->listexportimport->import)
         }
 
